@@ -11,16 +11,17 @@ linux operating systems.
 
 
 # Usage
->Usage: dmz [option(s)] [argument] ...
->-e [cmd]       - Daemonizes a shell command and redirects its output to a file.
->                    e.g. dmz -e "/usr/bin/dmesg --follow"
->-t             - Optional which goes along with -e. Appends a timestamp on each line on daemon's output.
->-l             - Lists all running daemons initiated by dmz.
->-d [dmz_id]    - Destroys a daemon by sending a SIGKILL signal to its process and deleting its log file.
->                 Use the -l option to check dmz ids and -s to save its log file.
->-s [dir_path]  - Optional. Used along with -d to keep a log file, moves the file (with filename its dmz id) to that directory.
->-h             - Displays this usage message.
-
+```
+Usage: dmz [option(s)] [argument] ...
+-e [cmd]       - Daemonizes a shell command and redirects its output to a file.
+                    e.g. dmz -e "/usr/bin/dmesg --follow"
+-t             - Optional which goes along with -e. Appends a timestamp on each line on daemon's output.
+-l             - Lists all running daemons initiated by dmz.
+-d [dmz_id]    - Destroys a daemon by sending a SIGKILL signal to its process and deleting its log file.
+                 Use the -l option to check dmz ids and -s to save its log file.
+-s [dir_path]  - Optional. Used along with -d to keep a log file, moves the file (with filename its dmz id) to that directory.
+-h             - Displays this usage message.
+```
 
 # Installation
 Just clone this git repository and:
