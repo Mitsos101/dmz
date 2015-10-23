@@ -1,5 +1,5 @@
 /***
- *  dmz - v0.1
+ *  dmz - v0.2
  *  Copyright (C) 2015, niemal
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,6 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <dirent.h>
-#include <sysexits.h>
 #include <signal.h>
 #include <time.h>
 #include <fcntl.h>
@@ -318,7 +317,7 @@ dmz_log(FILE *proc, pid_t pgid, char *cmd)
 
 
 void
-init_dmz(char *cmd)
+init_dmz(char *cmd, char *ch_dir)
 {
 	printf("CMD: %s\n", cmd);
 	get_this_dmz_id();
@@ -338,6 +337,13 @@ init_dmz(char *cmd)
 
         umask(S_IWGRP | S_IWOTH);
 
+        if (ch_dir != NULL)
+                if (chdir(ch_dir) == -1) {
+                        perror("Changing directory");
+                        printf("Failed to initiate daemon, quitting.\n");
+                        exit(EXIT_FAILURE);
+                }
+
 	FILE *dmz_proc = popen(cmd, "r");
 
 	pid = getpid();
@@ -353,16 +359,17 @@ usage(char *prog_name)
 	printf("Usage: %s [option(s)] [argument] ...\n"
 	"-e [cmd]     \t- Daemonizes a shell command and redirects its output to a file.\n"
 	"             \t\te.g. %s -e \"/usr/bin/dmesg --follow\"\n"
+        "-c [dir_path]\t- Optional which goes along with -e, changes the working directory of the daemon.\n"
 	"-t           \t- Optional which goes along with -e. Appends a timestamp on each line on daemon's output.\n"
 	"-l           \t- Lists all running daemons initiated by dmz.\n"
 	"-d [dmz_id]  \t- Destroys a daemon by sending a SIGKILL signal to its process and deleting its log file.\n"
         "             \t  Use the -l option to check dmz ids and -s to save its log file.\n"
         "-s [dir_path]\t- Optional. Used along with -d to keep a log file, moves the file (with filename its dmz id)"
-        " to that directory. Currently doesn't support moving between different filesystems.\n"
+        " to that directory.\n"
         "-h           \t- Displays this usage message.\n",
 	prog_name, prog_name);
 
-	exit(EX_USAGE);
+	exit(EXIT_SUCCESS);
 }
 
 
@@ -375,12 +382,13 @@ main(int argc, char **argv)
 	int flag;
 	unsigned int i;
 	char *cmd = NULL;
+        char *ch_dir = NULL;
         char *save_lf = NULL;
 	long int kill_id = -1;
 	unsigned int size = 0;
 	dmz_info *dmz_spawns = malloc(sizeof(dmz_info));
 
-	while ((flag = getopt(argc, argv, "lhe:d:ts:")) != -1) {
+	while ((flag = getopt(argc, argv, "c:lhe:d:ts:")) != -1) {
 		switch (flag) {
 		case 'l':
 			get_all_dmz_info(dmz_spawns, &size);
@@ -404,6 +412,9 @@ main(int argc, char **argv)
 			
 			printf("Total daemons running: %d\n", size);
 			exit(EXIT_SUCCESS);
+                case 'c':
+                        ch_dir = optarg;
+                        break;
 		case 'd':
 			kill_id = strtol(optarg, NULL, 10);
                         break;
@@ -457,7 +468,7 @@ main(int argc, char **argv)
         }
 
 	if (cmd) {
-		init_dmz(cmd);
+		init_dmz(cmd, ch_dir);
 		exit(EXIT_SUCCESS);
 	}
 }

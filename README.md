@@ -1,4 +1,4 @@
-dmz - v0.1
+dmz - v0.2
 ===========
 
 **Note: This software was written for personal educational purposes, meaning 
@@ -15,6 +15,7 @@ linux operating systems.
 Usage: dmz [option(s)] [argument] ...
 -e [cmd]       - Daemonizes a shell command and redirects its output to a file.
                     e.g. dmz -e "/usr/bin/dmesg --follow"
+-c [dir_path]  - Optional which goes along with -e, changes the working directory of the daemon.
 -t             - Optional which goes along with -e. Appends a timestamp on each line on daemon's output.
 -l             - Lists all running daemons initiated by dmz.
 -d [dmz_id]    - Destroys a daemon by sending a SIGKILL signal to its process and deleting its log file.
